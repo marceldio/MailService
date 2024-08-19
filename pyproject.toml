@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "course-w-mail-sevice"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+django = "4.2.15"
+pillow = "^10.4.0"
+psycopg2-binary = "^2.9.9"
+ipython = "^8.26.0"
+black = "^24.4.2"
+pytils = "^0.4.1"
+listview = "^0.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
