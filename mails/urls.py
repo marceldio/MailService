@@ -1,8 +1,9 @@
-from django.urls import path, include
+from django.urls import path
 from mails.apps import MailsConfig
+from mails.views import home
 
 app_name = MailsConfig.name
 
 urlpatterns = [
-    path("", include("mails.urls", namespace="mails"))
+    path("", home, name="home")
 ]
