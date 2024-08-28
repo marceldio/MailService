@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-)e6!2w&)v4b$y0o_inc_@##tp7m8)!%#wx&*cdo56$)j9o-aby
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"] # разрешен доступ всем
+ALLOWED_HOSTS = ["*"]  # разрешен доступ всем
 
 
 # Application definition
@@ -74,13 +74,13 @@ WSGI_APPLICATION = "congig.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mails',
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "mails",
+        "USER": "postgres",
+        "PASSWORD": "",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 
