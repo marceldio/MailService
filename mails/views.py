@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from mails.models import Maill
@@ -35,6 +35,9 @@ class MaillUpdateView(UpdateView):
     model = Maill
     fields = ["title", "body",]
     success_url = reverse_lazy("mails:maill_list")
+
+    def get_success_url(self):
+        return reverse("mails:maill_detail", args=[self.kwargs.get("pk")])
 
 
 class MaillDeleteView(DeleteView):
