@@ -1,0 +1,25 @@
+[
+  {
+    "model": "mails.recipient",
+    "pk": 1,
+    "fields": {
+      "first_name": "Петр",
+      "last_name": "Петров",
+      "middle_name": "Петрович",
+      "email": "chayan@list.ru",
+      "comment": "TEST"
+    }
+  },
+  {
+    "model": "mails.maill",
+    "pk": 1,
+    "fields": {
+      "title": "Test",
+      "body": "test test",
+      "recipient": 1,
+      "sent": true,
+      "created_at": "2024-08-28T22:30:12.065Z",
+      "updated_at": "2024-08-28T22:30:12.065Z"
+    }
+  }
+]

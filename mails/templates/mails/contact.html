@@ -1,0 +1,79 @@
+{% extends 'main/index.html' %}
+{% load my_tags %}
+{% block content %}
+<div class="album py-5 bg-body-tertiary">
+
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">Контакты</h1>
+    </div>
+
+    <div class="container">
+        <div class="row text-start">
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <tr>
+                                <td class="w-25">Страна</td>
+                                <td>USA</td>
+                            </tr>
+                            <tr>
+                                <td class="w-25">ИНН</td>
+                                <td>91-1144442</td>
+                            </tr>
+                            <tr>
+                                <td class="w-25">Адрес</td>
+                                <td>Redmond,WA,98052-6399</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">Свяжитесь с нами</h4>
+                    </div>
+                    <div class="card-body">
+
+                        <!--                    <form method="post">-->
+                        <!--                        {% csrf_token %}-->
+                        <!--                        <input name="name" class="form-control mb-2" placeholder="Имя" type="text">-->
+                        <!--                        <input name="tel" class="form-control phone-number mb-2" placeholder="Номер телефона">-->
+                        <!--                        <textarea name="message" class="form-control mb-2" placeholder="Сообщение"></textarea>-->
+                        <!--                        <input class="btn btn-primary w-100" type="submit" value="Отправить" />-->
+                        <!--                    </form>-->
+
+                        <form method="post" action="" class="form-floating">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="name">Имя</label>
+                                <input type="text" name="name" class="form-control" id="name"
+                                       placeholder="Введите ваше имя" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tel">Телефон</label>
+                                <input type="text" name="tel" class="form-control" id="tel"
+                                       placeholder="Введите телефон" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="message">Сообщение</label>
+                                <textarea type="text" name="message" class="form-control" id="message"
+                                          placeholder="Напишите сообщение" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Отправить</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <div class="btn-group">
+                <a class="btn btn-secondary" href="{% url 'catalog:product_list' %}" role="button">В каталог</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}>
