@@ -1,0 +1,43 @@
+{% extends 'mails/home.html' %}
+{% load my_tags %}
+{% block content %}
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h4 class="card-title">"{{ object.title }}" ({{ object.slug }})</h4>
+                </div>
+                <img src="{{ object.image | media_filter }}">
+                <div class="card-body">
+                    <p class="card-text">
+                        {{ object.content }} Создано:{{ object.created_at}}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-grid gap-2 d-md-block">
+                            <div class="btn-group">
+                                <p>
+                                    <a class="btn btn-primary" href="{% url 'blog:blog_list' %}" role="button">Назад</a>
+
+                                {% if perms.blog.change_blog and perms.blog.delete_blog or user == object.owner %}
+                                    <a class="btn btn-warning" href="{% url 'blog:blog_edit' object.pk %}"
+                                       role="button">Редактировать</a>
+                                    <a class="btn btn-danger" href="{% url 'blog:blog_delete' object.pk %}"
+                                       role="button">Удалить</a>
+
+                                </p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                Просмотры: {{ object.view_counter}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}
