@@ -1,7 +1,11 @@
 from django.db import models
 
+from users.models import User
+
 
 class Recipient(models.Model):
+    """Модель Адресат"""
+    email = models.EmailField(unique=True, verbose_name="Email")
     first_name = models.CharField(max_length=100, verbose_name="Имя", blank=True, null=True)
     last_name = models.CharField(
         max_length=100, verbose_name="Фамилия", blank=True, null=True
@@ -9,7 +13,6 @@ class Recipient(models.Model):
     middle_name = models.CharField(
         max_length=100, verbose_name="Отчество", blank=True, null=True
     )
-    email = models.EmailField(verbose_name="Email")
     comment = models.TextField(blank=True, null=True, verbose_name="Комментарий")
 
     def __str__(self):
@@ -33,17 +36,9 @@ class Recipient(models.Model):
 
 
 class Maill(models.Model):
+    """Модель Сообщение"""
     title = models.CharField(max_length=100, verbose_name="Заголовок")
     body = models.TextField(verbose_name="Содержание")
-    recipient = models.ForeignKey(
-        Recipient,
-        blank=True,
-        null=True,
-        on_delete=models.SET_NULL,
-        verbose_name="Адресат",
-        related_name="Адресаты",
-    )
-    sent = models.BooleanField(default=False, verbose_name="Отправлено")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -53,4 +48,53 @@ class Maill(models.Model):
     class Meta:
         verbose_name = "Письмо"
         verbose_name_plural = "Письма"
-        ordering = ["title", "recipient", "sent"]
+        ordering = ["title"]
+
+
+class Sending(models.Model):
+    """Модель рассылка"""
+    FREQUENCY_CHOICES = [
+        ("daily", 'daily'),
+        ("weekly", 'weekly'),
+        ("monthly", 'monthly'),
+    ]
+
+    STATUS_CHOICES = [
+        ('created', 'created'),
+        ('launched', 'launched'),
+        ('completed', 'completed'),
+    ]
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создана")
+    frequency = models.CharField(max_length=15, choices=FREQUENCY_CHOICES, verbose_name="Периодичность")
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, verbose_name="Статус")
+    company = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Название компании")
+    email = models.ForeignKey(Recipient, on_delete=models.CASCADE, verbose_name="Почта Адресата")
+    title = models.ForeignKey(Maill, on_delete=models.CASCADE, verbose_name="Тема письма")
+    def __str__(self):
+        return f'{self.title}: {self.created_at}, {self.frequency}, {self.status}'
+
+    class Meta:
+        verbose_name = "Рассылка"
+        verbose_name_plural = "Рассылки"
+        ordering = ["-created_at"]
+
+
+class Event(models.Model):
+    """Модель попыток рассылки"""
+    EVENT_STATUS_CHOICES = [
+        ('failed', 'Failed'),
+        ('succeeded', 'Succeeded'),
+    ]
+    event_datetime = models.DateTimeField(auto_now_add=True, verbose_name='Отправка')
+    event_status = models.CharField(max_length=15, choices=EVENT_STATUS_CHOICES, verbose_name='Статус')
+    server_response = models.TextField(blank=True, null=True, verbose_name='Ответ сервера')
+    email = models.ForeignKey(Recipient, on_delete=models.CASCADE, verbose_name='Email')
+    title = models.ForeignKey(Sending, on_delete=models.CASCADE, verbose_name='Тема рассылки')
+
+    def __str__(self):
+        return f'Отправка: {self.event_datetime}'
+
+    class Meta:
+        verbose_name = 'Отправка'
+        verbose_name_plural = 'Отправки'
