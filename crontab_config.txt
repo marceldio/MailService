@@ -1,0 +1,8 @@
+# Ежедневная задача (каждый день в 10:00)
+0 10 * * * cd /home/md/Django/course_w_mail_sevice && poetry run python manage.py send_emails
+
+# Еженедельная задача (каждый понедельник в 10:00)
+0 10 * * 1 cd /home/md/Django/course_w_mail_sevice && poetry run python manage.py send_emails
+
+# Ежемесячная задача (1-го числа каждого месяца в 10:00)
+0 10 1 * * cd /home/md/Django/course_w_mail_sevice && poetry run python manage.py send_emails
