@@ -49,4 +49,4 @@ class RecipientForm(forms.ModelForm):
 class SendingForm(forms.ModelForm):
     class Meta:
         model = Sending
-        fields = ("topic", "letter", "frequency")
+        fields = ("topic", "letter", "frequency", "email", "company")

@@ -81,10 +81,21 @@ class SendingCreateView(CreateView):
     extra_context = {"button_name": "Создать", "title": "Создать рассылку"}
 
 
+class SendingUpdateView(UpdateView):
+    model = Sending
+    form_class = SendingForm
+    success_url = reverse_lazy("mails:sending_list")
+    extra_context = {"button_name": "Сохранить", "title": "Редактировать рассылку"}
+
+
 class SendingDeleteView(DeleteView):
     model = Sending
     success_url = reverse_lazy("mails:sending_list")
     extra_context = {"title": "Удаление рассылки"}
+
+
+class SendingDetailView(DetailView):
+    model = Maill
 
 
 class MaillListView(ListView):
