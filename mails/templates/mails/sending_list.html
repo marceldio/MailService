@@ -6,7 +6,7 @@
         <div class="col-12 mb-5">
             {% if user.is_authenticated %}
             <p>
-                <a class="btn btn-primary" href="{% url 'mails:maill_create' %}">Добавить письмо</a>
+                <a class="btn btn-primary" href="{% url 'mails:sending_create' %}">Добавить рассылку</a>
             </p>
             {% endif %}
         </div>
@@ -16,17 +16,18 @@
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <p class="card-text">
-                            {{ object.title }}
-                            {{ object.body | slice:100 }}
+                            {{ object.topic }}
+                            {{ object.letter | slice:100 }}
+                            {{ object.status }}
                         </p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="btn-group">
                                 <p>
-                                    <a class="btn btn-outline-primary" href="{% url 'mails:maill_detail' object.pk %}"
+                                    <a class="btn btn-outline-primary" href="{% url 'mails:sending_detail' object.pk %}"
                                        role="button">Перейти</a>
-                                    <a class="btn btn-outline-warning" href="{% url 'mails:maill_update' object.pk %}"
+                                    <a class="btn btn-outline-warning" href="{% url 'mails:sending_update' object.pk %}"
                                        role="button">Редактировать</a>
-                                    <a class="btn btn-outline-danger" href="{% url 'mails:maill_delete' object.pk %}"
+                                    <a class="btn btn-outline-danger" href="{% url 'mails:sending_delete' object.pk %}"
                                        role="button">Удалить</a>
                                 </p>
                             </div>

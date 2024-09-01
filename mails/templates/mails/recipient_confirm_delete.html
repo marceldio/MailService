@@ -1,0 +1,21 @@
+{% extends 'mails/home.html' %}
+{% block content %}
+<div class="container">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-6">
+                <form class="row" method="post" enctype="multipart/form-data">
+                    <div class="card">
+                        <p class="card-text">Удалить этого адресата? {{ object.email }}</p>
+                        <div class="card-body">
+                            {% csrf_token %}
+                        </div>
+                        <button type="submit" class="btn btn-outline-danger">Подтвердить</button>
+                        <a class="btn btn-outline-primary" href="{% url 'mails:recipient_list' %}" role="button">Отменить</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
