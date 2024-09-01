@@ -2,7 +2,7 @@ import os
 
 
 def setup_crontab():
-    # Укажите путь к вашему crontab_config.txt файлу
+    # путь к crontab_config.txt файлу
     crontab_file = "/home/md/Django/course_w_mail_sevice/crontab_config.txt"
 
     # Чтение файла конфигурации

@@ -4,7 +4,7 @@ from mails.models import Maill, Recipient, Sending, Event
 
 @admin.register(Maill)
 class MaillAdmin(admin.ModelAdmin):
-    list_display = ("id", "title")
+    list_display = ("id", "title", "author")
     list_filter = ("title",)
     list_search = (
         "id",
@@ -14,7 +14,7 @@ class MaillAdmin(admin.ModelAdmin):
 
 @admin.register(Recipient)
 class RecipientAdmin(admin.ModelAdmin):
-    list_display = ("id", "email", "comment")
+    list_display = ("id", "email", "comment", "owner")
     list_filter = (
         "email",
         "comment",
@@ -27,15 +27,8 @@ class RecipientAdmin(admin.ModelAdmin):
 
 @admin.register(Sending)
 class SendingAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "topic",
-        "created_at",
-        "frequency",
-        "status",
-        "company",
-        "email",
-    )
+    list_display = ['id', 'letter', 'scheduled_at', 'status', 'company']
+    filter_horizontal = ['recipients']
 
 
 @admin.register(Event)
@@ -45,5 +38,5 @@ class EventAdmin(admin.ModelAdmin):
         "event_status",
         "server_response",
         "email",
-        "title",
+        "topic",
     )

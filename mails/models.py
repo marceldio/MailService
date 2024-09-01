@@ -1,6 +1,7 @@
 from django.db import models
-
 from users.models import User
+from django.utils import timezone
+from datetime import timedelta
 
 
 class Recipient(models.Model):
@@ -17,6 +18,11 @@ class Recipient(models.Model):
         max_length=100, verbose_name="Отчество", blank=True, null=True
     )
     comment = models.TextField(blank=True, null=True, verbose_name="Комментарий")
+    owner = models.ForeignKey(
+        User, verbose_name="Владелец",
+        blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
 
     def __str__(self):
         if self.first_name:
@@ -35,7 +41,7 @@ class Recipient(models.Model):
     class Meta:
         verbose_name = "Адресат"
         verbose_name_plural = "Адресаты"
-        ordering = ["first_name", "last_name", "email", "comment"]
+        ordering = ["email", "comment"]
 
 
 class Maill(models.Model):
@@ -45,6 +51,12 @@ class Maill(models.Model):
     body = models.TextField(verbose_name="Тело письма")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    author = models.ForeignKey(
+        User, verbose_name="Автор",
+        blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
+
 
     def __str__(self):
         return f"{self.title}"
@@ -53,21 +65,24 @@ class Maill(models.Model):
         verbose_name = "Письмо"
         verbose_name_plural = "Письма"
         ordering = ["title"]
+        permissions = [
+            ("can_view_maill", "Can view maill"),
+        ]
 
 
 class Sending(models.Model):
     """Модель рассылка"""
 
     FREQUENCY_CHOICES = [
-        ("daily", "daily"),
-        ("weekly", "weekly"),
-        ("monthly", "monthly"),
+        ("daily", "Раз в день"),
+        ("weekly", "Раз в неделю"),
+        ("monthly", "Раз в месяц"),
     ]
 
     STATUS_CHOICES = [
-        ("created", "created"),
-        ("launched", "launched"),
-        ("completed", "completed"),
+        ("created", "Создана"),
+        ("launched", "Запущена"),
+        ("completed", "Завершена"),
     ]
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создана")
@@ -78,10 +93,7 @@ class Sending(models.Model):
         max_length=15, choices=STATUS_CHOICES, verbose_name="Статус"
     )
     company = models.ForeignKey(
-        User, on_delete=models.CASCADE, verbose_name="Название компании"
-    )
-    email = models.ForeignKey(
-        Recipient, on_delete=models.CASCADE, verbose_name="Почта Адресата"
+        User, on_delete=models.CASCADE, related_name="sendings"
     )
     topic = models.ForeignKey(
         Maill, on_delete=models.CASCADE, related_name="Тема", blank=True, null=True
@@ -89,14 +101,35 @@ class Sending(models.Model):
     letter = models.ForeignKey(
         Maill, on_delete=models.CASCADE, related_name="Письмо", blank=True, null=True
     )
+    recipients = models.ManyToManyField(Recipient, related_name='sendings')
+    scheduled_at = models.DateTimeField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Автоматическое присвоение компании из текущего пользователя
+        if not self.company_id and 'user' in kwargs:
+            self.company = kwargs.pop('user').company
+
+        if not self.scheduled_at:
+            if self.frequency == "daily":
+                self.scheduled_at = timezone.now() + timedelta(days=1)
+            elif self.frequency == "weekly":
+                self.scheduled_at = timezone.now() + timedelta(weeks=1)
+            elif self.frequency == "monthly":
+                self.scheduled_at = timezone.now() + timedelta(days=30)
+
+        super(Sending, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.topic}: {self.created_at}, {self.frequency}, {self.status}"
+        return f'Sending {self.id} - {self.status}'
+
 
     class Meta:
         verbose_name = "Рассылка"
         verbose_name_plural = "Рассылки"
         ordering = ["-created_at"]
+        permissions = [
+            ("can_view_sending", "Can view sending"),
+        ]
 
 
 class Event(models.Model):
@@ -114,7 +147,7 @@ class Event(models.Model):
         blank=True, null=True, verbose_name="Ответ сервера"
     )
     email = models.ForeignKey(Recipient, on_delete=models.CASCADE, verbose_name="Email")
-    title = models.ForeignKey(
+    topic = models.ForeignKey(
         Sending, on_delete=models.CASCADE, verbose_name="Тема рассылки"
     )
 

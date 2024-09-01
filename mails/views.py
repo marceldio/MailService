@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
@@ -24,13 +25,17 @@ def contact(request):
     return render(request, "mails/contact.html")
 
 
-class RecipientListView(ListView):
+class RecipientListView(LoginRequiredMixin, ListView):
     model = Recipient
+    context_object_name = 'recipients'
+    template_name = 'mails/recipient_list.html'
+
+    def get_queryset(self):
+        # Возвращаем только объекты, принадлежащие текущему пользователю
+        return Recipient.objects.filter(owner=self.request.user)
 
     def get_context_data(self, *args, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        recipients = Recipient.objects.all()
-        context_data["recipients"] = recipients
         context_data["title"] = "Адресаты"
         return context_data
 
@@ -49,8 +54,7 @@ class RecipientCreateView(CreateView):
 class RecipientUpdateView(UpdateView):
     model = Recipient
     fields = [
-        "title",
-        "body",
+        "email", "id", "comment",
     ]
     success_url = reverse_lazy("mails:recipient_list")
 
@@ -63,13 +67,17 @@ class RecipientDeleteView(DeleteView):
     success_url = reverse_lazy("mails:recipient_list")
 
 
-class SendingListView(ListView):
+class SendingListView(LoginRequiredMixin, ListView):
     model = Sending
+    context_object_name = 'sendings'
+    template_name = 'mails/sending_list.html'
+
+    def get_queryset(self):
+        # Возвращаем только объекты, принадлежащие текущему пользователю
+        return Sending.objects.filter(company=self.request.user)
 
     def get_context_data(self, *args, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        sendings = Sending.objects.all()
-        context_data["sendings"] = sendings
         context_data["title"] = "Рассылки"
         return context_data
 
@@ -79,6 +87,11 @@ class SendingCreateView(CreateView):
     form_class = SendingForm
     success_url = reverse_lazy("mails:sending_list")
     extra_context = {"button_name": "Создать", "title": "Создать рассылку"}
+
+    def form_valid(self, form):
+        # Передаем текущего пользователя в метод save для установки company
+        form.instance.company = self.request.user
+        return super().form_valid(form)
 
 
 class SendingUpdateView(UpdateView):
@@ -95,16 +108,21 @@ class SendingDeleteView(DeleteView):
 
 
 class SendingDetailView(DetailView):
-    model = Maill
+    model = Sending
+
 
 
 class MaillListView(ListView):
     model = Maill
+    context_object_name = 'mails'
+    template_name = 'mails/maill_list.html'
+
+    def get_queryset(self):
+        # Возвращаем только объекты, принадлежащие текущему пользователю
+        return Maill.objects.filter(author=self.request.user)
 
     def get_context_data(self, *args, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        mails = Sending.objects.all()
-        context_data["mails"] = mails
         context_data["title"] = "Письма"
         return context_data
 
@@ -121,13 +139,15 @@ class MaillCreateView(CreateView):
 
 class MaillUpdateView(UpdateView):
     model = Maill
-    fields = [
-        "title",
-        "body",
-    ]
+    # fields = [
+    #     "title",
+    #     "body",
+    # ]
+    form_class = MaillForm
 
     def get_success_url(self):
         return reverse("mails:maill_detail", args=[self.kwargs.get("pk")])
+        # return reverse("mails:maill_detail")
 
 
 class MaillDeleteView(DeleteView):

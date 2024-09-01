@@ -1,4 +1,5 @@
 import random
+import secrets
 import string
 from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
@@ -21,9 +22,12 @@ class UserCreateView(CreateView):
     def form_valid(self, form):
         user = form.save()
         user.is_active = False
-        user.save()
+        token = secrets.token_hex(16)
+        user.token = token
+        user.save(update_fields=['token', 'is_active'])
         host = self.request.get_host()
-        url = f"http://{host}/users/email-confirm/"
+        url = f'http://{host}/users/email-confirm/{token}'
+
         send_mail(
             subject="Подтверждение регистрации",
             message=f"Перейдите по ссылке для подтверждения регистрации {url}",
@@ -32,13 +36,19 @@ class UserCreateView(CreateView):
         )
         return super().form_valid(form)
 
+# def email_verification(request, token):
+#     email = request.GET.get("email")
+#     user = User.objects.filter(email=email, token=token).first()
+#     user.is_active = True
+#     user.save()
+#     return HttpResponse("Ваш email подтвержден")
 
-def email_verification(self, request):
-    email = request.GET.get("email")
-    user = User.objects.filter(email=email).first()
+def email_verification(request, token):
+    user = get_object_or_404(User, token=token)
     user.is_active = True
     user.save()
-    return HttpResponse("Ваш email подтвержден")
+    return redirect(reverse("users:login"))
+
 
 
 def generate_random_password(length=10):
@@ -59,7 +69,6 @@ def reset_password(request):
             new_password = generate_random_password()
             user.password = make_password(new_password)
             user.save()
-
             # Отправка письма с новым паролем
             send_mail(
                 "Восстановление пароля",
