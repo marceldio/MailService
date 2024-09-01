@@ -1,5 +1,4 @@
-{% extends 'main/index.html' %}
-{% load my_tags %}
+{% extends 'mails/home.html' %}
 {% block content %}
 <div class="album py-5 bg-body-tertiary">
 
@@ -35,15 +34,6 @@
                         <h4 class="my-0 font-weight-normal">Свяжитесь с нами</h4>
                     </div>
                     <div class="card-body">
-
-                        <!--                    <form method="post">-->
-                        <!--                        {% csrf_token %}-->
-                        <!--                        <input name="name" class="form-control mb-2" placeholder="Имя" type="text">-->
-                        <!--                        <input name="tel" class="form-control phone-number mb-2" placeholder="Номер телефона">-->
-                        <!--                        <textarea name="message" class="form-control mb-2" placeholder="Сообщение"></textarea>-->
-                        <!--                        <input class="btn btn-primary w-100" type="submit" value="Отправить" />-->
-                        <!--                    </form>-->
-
                         <form method="post" action="" class="form-floating">
                             {% csrf_token %}
                             <div class="mb-3">
@@ -70,7 +60,7 @@
         </div>
         <div class="d-grid gap-2 col-6 mx-auto">
             <div class="btn-group">
-                <a class="btn btn-secondary" href="{% url 'catalog:product_list' %}" role="button">В каталог</a>
+                <a class="btn btn-outline-secondary" href="{% url 'mails:home' %}" role="button">На главную</a>
             </div>
         </div>
     </div>

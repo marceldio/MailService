@@ -1,28 +1,42 @@
 from django.contrib import admin
-from mails.models import Maill, Recipient
+from mails.models import Maill, Recipient, Sending, Event
 
 
 @admin.register(Maill)
 class MaillAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "sent", "created_at", "updated_at")
-    list_filter = (
-        "title",
-        "recipient",
-        "sent",
-    )
+    list_display = ("id", "title", "author")
+    list_filter = ("title",)
     list_search = (
         "id",
         "title",
-        "recipient",
     )
 
 
 @admin.register(Recipient)
 class RecipientAdmin(admin.ModelAdmin):
-    list_display = ("id", "email")
+    list_display = ("id", "email", "comment", "owner")
     list_filter = (
-        "email", "comment",
+        "email",
+        "comment",
     )
     list_search = (
-        "email", 'comment',
+        "email",
+        "comment",
+    )
+
+
+@admin.register(Sending)
+class SendingAdmin(admin.ModelAdmin):
+    list_display = ['id', 'letter', 'scheduled_at', 'status', 'company']
+    filter_horizontal = ['recipients']
+
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    list_display = (
+        "event_datetime",
+        "event_status",
+        "server_response",
+        "email",
+        "topic",
     )

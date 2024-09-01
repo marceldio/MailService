@@ -1,0 +1,32 @@
+{% extends 'mails/home.html' %}
+{% block content %}
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            <div class="col">
+                <div class="card shadow-sm">
+
+                    <div class="card-body">
+                        <p class="card-text">Заголовок: {{ object.topic }}</p>
+                        <p class="card-text">Содержание: {{ object.letter | slice:100 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <div class="d-grid gap-2 d-md-block">
+
+                                <div class="btn-group">
+                                    <a class="btn btn-primary" href="
+                                    {% url 'mails:sending_detail' sending.pk %}" role="button">Смотреть</a>
+                                    <a class="btn btn-secondary" href="
+                                    {% url 'mails:sending_list' %}" role="button">Назад</a>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
