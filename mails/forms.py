@@ -49,12 +49,12 @@ class RecipientForm(forms.ModelForm):
 class SendingForm(forms.ModelForm):
     class Meta:
         model = Sending
-        fields = ['letter', 'recipients', 'frequency', 'status']
+        fields = ["letter", "recipients", "frequency", "status"]
         widgets = {
-            'recipients': forms.CheckboxSelectMultiple,
+            "recipients": forms.CheckboxSelectMultiple,
         }
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user  # передача текущего пользователя в форму
+        kwargs["user"] = self.request.user  # передача текущего пользователя в форму
         return kwargs

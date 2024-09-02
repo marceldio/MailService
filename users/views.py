@@ -24,9 +24,9 @@ class UserCreateView(CreateView):
         user.is_active = False
         token = secrets.token_hex(16)
         user.token = token
-        user.save(update_fields=['token', 'is_active'])
+        user.save(update_fields=["token", "is_active"])
         host = self.request.get_host()
-        url = f'http://{host}/users/email-confirm/{token}'
+        url = f"http://{host}/users/email-confirm/{token}"
 
         send_mail(
             subject="Подтверждение регистрации",
@@ -36,19 +36,12 @@ class UserCreateView(CreateView):
         )
         return super().form_valid(form)
 
-# def email_verification(request, token):
-#     email = request.GET.get("email")
-#     user = User.objects.filter(email=email, token=token).first()
-#     user.is_active = True
-#     user.save()
-#     return HttpResponse("Ваш email подтвержден")
 
 def email_verification(request, token):
     user = get_object_or_404(User, token=token)
     user.is_active = True
     user.save()
     return redirect(reverse("users:login"))
-
 
 
 def generate_random_password(length=10):
@@ -59,33 +52,39 @@ def generate_random_password(length=10):
 
 
 def reset_password(request):
-    # context = {
-    #     'success_message': 'Пароль успешно сброшен на email'
-    # }
     if request.method == "POST":
         email = request.POST.get("email")
-        try:
-            user = get_object_or_404(User, email=email)
+        user = User.objects.filter(email=email).first()
+
+        if user:
             new_password = generate_random_password()
             user.password = make_password(new_password)
             user.save()
+
             # Отправка письма с новым паролем
             send_mail(
                 "Восстановление пароля",
                 f"Ваш новый пароль: {new_password}",
                 from_email=EMAIL_HOST_USER,
                 recipient_list=[user.email],
-                fail_silently=False,  # Отключение отправки ошибок
+                fail_silently=False,
             )
-            return HttpResponse("Пароль сброшен на email")
-        except User.DoesNotExist:
-            return HttpResponse("Пользователь с таким email не найден")
+            success_message = "Пароль сброшен на ваш email."
+        else:
+            success_message = "Пользователь с таким email не найден."
+
+        return render(request, "users/reset_password.html", {"success_massage": success_message})
+
+    # Если метод не POST, рендерим страницу сброса пароля (GET запрос)
+    return render(request, "users/reset_password.html")
+
+
 
 
 class UserProfileView(UpdateView):
     model = User
     form_class = UserProfileForm
-    success_url = reverse_lazy("users:profile")
+    success_url = reverse_lazy("mails:home")
 
     def get_object(self, queryset=None):
         return self.request.user

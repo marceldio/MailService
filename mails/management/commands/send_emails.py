@@ -5,16 +5,27 @@ from mails.models import Sending
 
 
 class Command(BaseCommand):
-    help = 'Отправка рассылки по расписанию'
+    help = "Отправка рассылки по расписанию"
 
     def handle(self, *args, **kwargs):
         self.send_mailing()
 
     def send_mailing(self):
         zone = pytz.timezone(settings.TIME_ZONE)
-        # Ваш код рассылки
-        mailings = Sending.objects.filter(status='active')
+        self.stdout.write(self.style.SUCCESS(f"Timezone set to {zone}"))
+        mailings = Sending.objects.filter(status="launched")
+        self.stdout.write(
+            self.style.SUCCESS(f"Найдено {mailings.count()} активных рассылки")
+        )
+
         for mailing in mailings:
             # Логика отправки письма
-            mailing.send()
-            self.stdout.write(self.style.SUCCESS(f'Рассылка отправлена на {mailing.email}'))
+            try:
+                mailing.send()
+                self.stdout.write(
+                    self.style.SUCCESS(f"Рассылка отправлена на {mailing.id}")
+                )
+            except Exception as e:
+                self.stdout.write(
+                    self.style.ERROR(f"Ошибка отправки на {mailing.id}: {str(e)}")
+                )
