@@ -52,27 +52,33 @@ def generate_random_password(length=10):
 
 
 def reset_password(request):
-    # context = {
-    #     'success_message': 'Пароль успешно сброшен на email'
-    # }
     if request.method == "POST":
         email = request.POST.get("email")
-        try:
-            user = get_object_or_404(User, email=email)
+        user = User.objects.filter(email=email).first()
+
+        if user:
             new_password = generate_random_password()
             user.password = make_password(new_password)
             user.save()
+
             # Отправка письма с новым паролем
             send_mail(
                 "Восстановление пароля",
                 f"Ваш новый пароль: {new_password}",
                 from_email=EMAIL_HOST_USER,
                 recipient_list=[user.email],
-                fail_silently=False,  # Отключение отправки ошибок
+                fail_silently=False,
             )
-            return HttpResponse("Пароль сброшен на email")
-        except User.DoesNotExist:
-            return HttpResponse("Пользователь с таким email не найден")
+            success_message = "Пароль сброшен на ваш email."
+        else:
+            success_message = "Пользователь с таким email не найден."
+
+        return render(request, "users/reset_password.html", {"success_massage": success_message})
+
+    # Если метод не POST, рендерим страницу сброса пароля (GET запрос)
+    return render(request, "users/reset_password.html")
+
+
 
 
 class UserProfileView(UpdateView):
