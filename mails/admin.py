@@ -27,8 +27,8 @@ class RecipientAdmin(admin.ModelAdmin):
 
 @admin.register(Sending)
 class SendingAdmin(admin.ModelAdmin):
-    list_display = ['id', 'letter', 'scheduled_at', 'status', 'company']
-    filter_horizontal = ['recipients']
+    list_display = ["id", "letter", "scheduled_at", "status", "company"]
+    filter_horizontal = ["recipients"]
 
 
 @admin.register(Event)

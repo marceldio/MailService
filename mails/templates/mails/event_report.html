@@ -1,0 +1,49 @@
+{% extends 'mails/home.html' %}
+{% block content %}
+    <h1>Отчет по попыткам рассылки</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Дата и время отправки</th>
+                <th>Статус</th>
+                <th>Email</th>
+                <th>Тема рассылки</th>
+                <th>Ответ сервера</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+                <tr>
+                    <td>{{ event.event_datetime }}</td>
+                    <td>{{ event.get_event_status_display }}</td>
+                    <td>{{ event.email.email }}</td>
+                    <td>{{ event.topic }}</td>
+                    <td>{{ event.server_response }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Добавление пагинации, если нужно -->
+    {% if is_paginated %}
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; Первая</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Назад</a>
+                {% endif %}
+
+                <span class="current">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Вперед</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% endblock %}
+
+

@@ -1,6 +1,9 @@
+from random import sample
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
+from django.views import View
 from django.views.generic import (
     ListView,
     DetailView,
@@ -9,12 +12,9 @@ from django.views.generic import (
     DeleteView,
 )
 
+from blog.models import Blog
 from mails.forms import RecipientForm, SendingForm, MaillForm
-from mails.models import Recipient, Sending, Maill
-
-
-def home(request):
-    return render(request, "mails/home.html")
+from mails.models import Recipient, Sending, Maill, Event
 
 
 def about(request):
@@ -27,8 +27,8 @@ def contact(request):
 
 class RecipientListView(LoginRequiredMixin, ListView):
     model = Recipient
-    context_object_name = 'recipients'
-    template_name = 'mails/recipient_list.html'
+    context_object_name = "recipients"
+    template_name = "mails/recipient_list.html"
 
     def get_queryset(self):
         # Возвращаем только объекты, принадлежащие текущему пользователю
@@ -46,7 +46,6 @@ class RecipientDetailView(DetailView):
 
 class RecipientCreateView(CreateView):
     model = Recipient
-    # fields = ["email", "id", "comment"]
     form_class = RecipientForm
     success_url = reverse_lazy("mails:recipient_list")
 
@@ -54,7 +53,9 @@ class RecipientCreateView(CreateView):
 class RecipientUpdateView(UpdateView):
     model = Recipient
     fields = [
-        "email", "id", "comment",
+        "email",
+        "id",
+        "comment",
     ]
     success_url = reverse_lazy("mails:recipient_list")
 
@@ -69,8 +70,8 @@ class RecipientDeleteView(DeleteView):
 
 class SendingListView(LoginRequiredMixin, ListView):
     model = Sending
-    context_object_name = 'sendings'
-    template_name = 'mails/sending_list.html'
+    context_object_name = "sendings"
+    template_name = "mails/sending_list.html"
 
     def get_queryset(self):
         # Возвращаем только объекты, принадлежащие текущему пользователю
@@ -111,11 +112,10 @@ class SendingDetailView(DetailView):
     model = Sending
 
 
-
 class MaillListView(ListView):
     model = Maill
-    context_object_name = 'mails'
-    template_name = 'mails/maill_list.html'
+    context_object_name = "mails"
+    template_name = "mails/maill_list.html"
 
     def get_queryset(self):
         # Возвращаем только объекты, принадлежащие текущему пользователю
@@ -139,10 +139,6 @@ class MaillCreateView(CreateView):
 
 class MaillUpdateView(UpdateView):
     model = Maill
-    # fields = [
-    #     "title",
-    #     "body",
-    # ]
     form_class = MaillForm
 
     def get_success_url(self):
@@ -154,3 +150,41 @@ class MaillDeleteView(DeleteView):
     model = Maill
     success_url = reverse_lazy("mails:maill_list")
     extra_context = {"title": "Удаление письма"}
+
+
+class HomePageView(View):
+    template_name = "mails/home_page.html"  # Указываем шаблон
+
+    def get(self, request, *args, **kwargs):
+        total_sendings = Sending.objects.count()
+        active_sendings = Sending.objects.filter(status="launched").count()
+        unique_recipients = Recipient.objects.distinct("email").count()
+
+        # Получение трех случайных статей из блога
+        total_articles = Blog.objects.count()
+        if total_articles >= 3:
+            random_articles = sample(list(Blog.objects.all()), 3)
+        else:
+            random_articles = Blog.objects.all()
+
+        context = {
+            "total_sendings": total_sendings,
+            "active_sendings": active_sendings,
+            "unique_recipients": unique_recipients,
+            "random_articles": random_articles,
+        }
+        return render(request, self.template_name, context)
+
+
+class EventReportView(ListView):
+    model = Event
+    template_name = "mails/event_report.html"
+    context_object_name = "events"
+    paginate_by = 20  # Количество событий на одной странице, если нужно
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        status = self.request.GET.get("status")
+        if status:
+            queryset = queryset.filter(event_status=status)
+        return queryset.order_by("-event_datetime")
