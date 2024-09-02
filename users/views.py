@@ -24,9 +24,9 @@ class UserCreateView(CreateView):
         user.is_active = False
         token = secrets.token_hex(16)
         user.token = token
-        user.save(update_fields=['token', 'is_active'])
+        user.save(update_fields=["token", "is_active"])
         host = self.request.get_host()
-        url = f'http://{host}/users/email-confirm/{token}'
+        url = f"http://{host}/users/email-confirm/{token}"
 
         send_mail(
             subject="Подтверждение регистрации",
@@ -36,19 +36,12 @@ class UserCreateView(CreateView):
         )
         return super().form_valid(form)
 
-# def email_verification(request, token):
-#     email = request.GET.get("email")
-#     user = User.objects.filter(email=email, token=token).first()
-#     user.is_active = True
-#     user.save()
-#     return HttpResponse("Ваш email подтвержден")
 
 def email_verification(request, token):
     user = get_object_or_404(User, token=token)
     user.is_active = True
     user.save()
     return redirect(reverse("users:login"))
-
 
 
 def generate_random_password(length=10):
@@ -85,7 +78,7 @@ def reset_password(request):
 class UserProfileView(UpdateView):
     model = User
     form_class = UserProfileForm
-    success_url = reverse_lazy("users:profile")
+    success_url = reverse_lazy("mails:home")
 
     def get_object(self, queryset=None):
         return self.request.user
