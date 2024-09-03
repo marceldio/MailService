@@ -107,5 +107,6 @@ class UserListView(ListView):
     template_name = "users/user_list.html"
 
     def get_queryset(self, *args, **kwargs):
-        queryset = User.objects.all()
+        # Исключаем суперпользователя с email 'admin@example.com'
+        queryset = User.objects.exclude(email='admin@example.com')
         return queryset
