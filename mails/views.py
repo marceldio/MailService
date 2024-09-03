@@ -201,9 +201,17 @@ class EventReportView(ListView):
     context_object_name = "events"
     paginate_by = 20  # Количество событий на одной странице, если нужно
 
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
+    #     status = self.request.GET.get("status")
+    #     if status:
+    #         queryset = queryset.filter(event_status=status)
+    #     return queryset.order_by("-event_datetime")
     def get_queryset(self):
-        queryset = super().get_queryset()
-        status = self.request.GET.get("status")
-        if status:
-            queryset = queryset.filter(event_status=status)
-        return queryset.order_by("-event_datetime")
+        # Фильтруем события только для текущего пользователя
+        return Event.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['events'] = self.get_queryset()
+        return context

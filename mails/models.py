@@ -181,6 +181,7 @@ class Event(models.Model):
     topic = models.ForeignKey(
         Sending, on_delete=models.CASCADE, verbose_name="Тема рассылки"
     )
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="owner", blank=True, null=True)
 
     def __str__(self):
         return f"Отправка: {self.event_datetime}"
