@@ -2,14 +2,15 @@ import random
 import secrets
 import string
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, ListView
 
 from config.settings import EMAIL_HOST_USER
-from users.forms import UserRegisterForm, UserProfileForm
+from users.forms import UserRegisterForm, UserProfileForm, UserProfileManagerForm
 from users.models import User
 
 
@@ -73,22 +74,73 @@ def reset_password(request):
         else:
             success_message = "Пользователь с таким email не найден."
 
-        return render(request, "users/reset_password.html", {"success_massage": success_message})
+        return render(
+            request, "users/reset_password.html", {"success_massage": success_message}
+        )
 
     # Если метод не POST, рендерим страницу сброса пароля (GET запрос)
     return render(request, "users/reset_password.html")
 
 
-
-
 class UserProfileView(UpdateView):
     model = User
     form_class = UserProfileForm
-    success_url = reverse_lazy("mails:home")
+    success_url = reverse_lazy("users:user_list")
 
     def get_object(self, queryset=None):
-        return self.request.user
+        pk = self.kwargs.get("pk")
+        if pk:
+            return get_object_or_404(User, pk=pk)
+        raise Http404("User not found")
 
-    def form_valid(self, form):
-        form.save()
-        return redirect(self.success_url)
+    def get_form_class(self):
+        user = self.request.user
+        if user == self.get_object():
+            return UserProfileForm
+        if user.has_perm("users.can_block_users"):
+            return UserProfileManagerForm
+        raise PermissionDenied
+
+
+# class UserProfileView(UpdateView):
+#     model = User
+#     success_url = reverse_lazy("users:user_list")
+#
+#     def get_object(self, queryset=None):
+#         user = self.request.user
+#         if user.has_perm("users.can_block_users"):
+#             # Если менеджер, получаем пользователя по ID из URL
+#             user_pk = self.kwargs.get("pk")
+#             if user_pk:
+#                 return get_object_or_404(User, pk=user_pk)
+#         # Если не менеджер или не указан ID, возвращаем текущего пользователя
+#         return user
+#
+#     def get_form_class(self):
+#         user = self.request.user
+#         if user == self.get_object():
+#             # Если пользователь редактирует сам себя, используем обычную форму
+#             return UserProfileForm
+#         if user.has_perm("users.can_block_users"):
+#             # Если менеджер редактирует другого пользователя, используем форму для менеджера
+#             return UserProfileManagerForm
+#         raise PermissionDenied
+#
+#     def form_valid(self, form):
+#         # Проверка на попытку менеджера деактивировать самого себя
+#         if self.object == self.request.user and not form.cleaned_data.get('is_active', True):
+#             form.add_error(None, "Вы не можете деактивировать самого себя.")
+#             return self.form_invalid(form)
+#
+#         form.save()
+#         return redirect(self.success_url)
+
+
+class UserListView(ListView):
+    model = User
+    template_name = "users/user_list.html"
+
+    def get_queryset(self, *args, **kwargs):
+        # queryset = super().get_queryset()
+        queryset = User.objects.all()
+        return queryset

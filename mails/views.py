@@ -1,6 +1,7 @@
 from random import sample
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views import View
@@ -13,8 +14,13 @@ from django.views.generic import (
 )
 
 from blog.models import Blog
-from mails.forms import RecipientForm, SendingForm, MaillForm
+from mails.forms import RecipientForm, SendingForm, MaillForm, SendingManagerForm
 from mails.models import Recipient, Sending, Maill, Event
+from mails.services import (
+    get_sendings_from_cache,
+    get_mails_from_cache,
+    get_recipients_from_cache,
+)
 
 
 def about(request):
@@ -32,7 +38,8 @@ class RecipientListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         # Возвращаем только объекты, принадлежащие текущему пользователю
-        return Recipient.objects.filter(owner=self.request.user)
+        # return Recipient.objects.filter(owner=self.request.user)
+        return get_recipients_from_cache(self)
 
     def get_context_data(self, *args, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -75,7 +82,8 @@ class SendingListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         # Возвращаем только объекты, принадлежащие текущему пользователю
-        return Sending.objects.filter(company=self.request.user)
+        # return Sending.objects.filter(company=self.request.user)
+        return get_sendings_from_cache()
 
     def get_context_data(self, *args, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -95,11 +103,21 @@ class SendingCreateView(CreateView):
         return super().form_valid(form)
 
 
-class SendingUpdateView(UpdateView):
+class SendingUpdateView(LoginRequiredMixin, UpdateView):
     model = Sending
     form_class = SendingForm
     success_url = reverse_lazy("mails:sending_list")
     extra_context = {"button_name": "Сохранить", "title": "Редактировать рассылку"}
+
+    def get_form_class(self):
+        user = self.request.user
+        if user == self.object.company:
+            return SendingForm
+        if user.has_perm("mails.can_disable_sending") and user.has_perm(
+            "mails.can_view_sending"
+        ):
+            return SendingManagerForm
+        raise PermissionDenied
 
 
 class SendingDeleteView(DeleteView):
@@ -119,7 +137,8 @@ class MaillListView(ListView):
 
     def get_queryset(self):
         # Возвращаем только объекты, принадлежащие текущему пользователю
-        return Maill.objects.filter(author=self.request.user)
+        # return Maill.objects.filter(author=self.request.user)
+        return get_mails_from_cache(self)
 
     def get_context_data(self, *args, **kwargs):
         context_data = super().get_context_data(**kwargs)

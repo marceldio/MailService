@@ -7,6 +7,7 @@ from users.views import (
     email_verification,
     UserProfileView,
     reset_password,
+    UserListView,
 )
 
 app_name = UsersConfig.name
@@ -15,7 +16,8 @@ urlpatterns = [
     path("login/", LoginView.as_view(template_name="login.html"), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("register/", UserCreateView.as_view(), name="register"),
-    path("profile/", UserProfileView.as_view(), name="profile"),
+    path("profile/<int:pk>/", UserProfileView.as_view(), name="profile"),
     path("reset-password/", reset_password, name="reset_password"),
     path("email-confirm/<str:token>/", email_verification, name="email_confirm"),
+    path("user_list/", UserListView.as_view(), name="user_list"),
 ]

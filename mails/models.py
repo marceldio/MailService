@@ -99,6 +99,7 @@ class Sending(models.Model):
     )
     recipients = models.ManyToManyField(Recipient, related_name="sendings")
     scheduled_at = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField(blank=True, null=True, default=True)
 
     def save(self, *args, **kwargs):
         # Автоматическое присвоение компании из текущего пользователя
@@ -158,6 +159,7 @@ class Sending(models.Model):
         ordering = ["-created_at"]
         permissions = [
             ("can_view_sending", "Can view sending"),
+            ("can_disable_sending", "Can disable sending"),
         ]
 
 

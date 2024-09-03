@@ -1,0 +1,35 @@
+{% extends 'mails/home.html' %}
+
+{% block content %}
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
+            {% for object in object_list %}
+            <div class="col">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <p class="card-text">
+                            {{ object.email }}
+                            {{ object.is_active }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <p>
+                                    {% if object.pk %}
+                                    <a class="btn btn-outline-warning" href="{% url 'users:profile' object.pk %}"
+                                       role="button">Редактировать</a>
+                                    {% else %}
+                                    <span class="btn btn-outline-warning disabled">Редактировать</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,12 +3,6 @@ from django.forms import ModelForm
 from mails.models import Maill, Recipient, Sending
 
 
-class MailsModeratorForm(ModelForm):
-    class Meta:
-        model = Maill
-        fields = ("title", "body")
-
-
 class MaillForm(forms.ModelForm):
     class Meta:
         model = Maill
@@ -58,3 +52,9 @@ class SendingForm(forms.ModelForm):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user  # передача текущего пользователя в форму
         return kwargs
+
+
+class SendingManagerForm(ModelForm):
+    class Meta:
+        model = Sending
+        fields = ("is_active",)

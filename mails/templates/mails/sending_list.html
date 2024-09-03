@@ -10,9 +10,11 @@
             </p>
             {% endif %}
         </div>
+
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4">
             {% for object in object_list %}
             <div class="col">
+                {% if perms.mails.can_view_sending and perms.mails.can_disable_sending or user == object.company %}
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <p class="card-text">
@@ -20,23 +22,30 @@
                             {{ object.letter | slice:100 }}
                             {{ object.status }}
                         </p>
+
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="btn-group">
                                 <p>
+
                                     <a class="btn btn-outline-primary" href="{% url 'mails:sending_detail' object.pk %}"
                                        role="button">Перейти</a>
                                     <a class="btn btn-outline-warning" href="{% url 'mails:sending_update' object.pk %}"
                                        role="button">Редактировать</a>
+
+                                    {% if user == object.company %}
                                     <a class="btn btn-outline-danger" href="{% url 'mails:sending_delete' object.pk %}"
                                        role="button">Удалить</a>
+                                    {% endif %}
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
+
     </div>
 </div>
 {% endblock %}

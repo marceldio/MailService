@@ -17,3 +17,13 @@ class UserProfileForm(UserChangeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["password"].widget = forms.HiddenInput()
+
+
+class UserProfileManagerForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ("is_active", "email")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["password"].widget = forms.HiddenInput()
