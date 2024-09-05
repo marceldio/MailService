@@ -6,7 +6,7 @@ from mails.models import Maill, Recipient, Sending
 class MaillForm(forms.ModelForm):
     class Meta:
         model = Maill
-        exclude = ("recipient",)
+        exclude = ("author",)
 
     # Список запрещенных слов
     forbidden_words = [
@@ -37,7 +37,7 @@ class MaillForm(forms.ModelForm):
 class RecipientForm(forms.ModelForm):
     class Meta:
         model = Recipient
-        fields = "__all__"
+        exclude = ("owner",)
 
 
 class SendingForm(forms.ModelForm):
@@ -48,10 +48,14 @@ class SendingForm(forms.ModelForm):
             "recipients": forms.CheckboxSelectMultiple,
         }
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["user"] = self.request.user  # передача текущего пользователя в форму
-        return kwargs
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)  # Извлекаем текущего пользователя
+        super(SendingForm, self).__init__(*args, **kwargs)
+
+        # Фильтруем список адресатов, исключая самого пользователя
+        if user:
+            self.fields["recipients"].queryset = Recipient.objects.filter(owner=user).exclude(email=user.email)
 
 
 class SendingManagerForm(ModelForm):
