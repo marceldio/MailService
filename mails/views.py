@@ -2,7 +2,7 @@ from random import sample
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic import (
@@ -56,6 +56,12 @@ class RecipientCreateView(CreateView):
     form_class = RecipientForm
     success_url = reverse_lazy("mails:recipient_list")
 
+    def form_valid(self, form):
+        recipient = form.save(commit=False)
+        recipient.owner = self.request.user  # Присваиваем текущего пользователя
+        recipient.save()
+        return redirect(self.success_url)
+
 
 class RecipientUpdateView(UpdateView):
     model = Recipient
@@ -95,12 +101,18 @@ class SendingCreateView(CreateView):
     model = Sending
     form_class = SendingForm
     success_url = reverse_lazy("mails:sending_list")
-    extra_context = {"button_name": "Создать", "title": "Создать рассылку"}
+    # extra_context = {"button_name": "Создать", "title": "Создать рассылку"}
 
     def form_valid(self, form):
         # Передаем текущего пользователя в метод save для установки company
         form.instance.company = self.request.user
         return super().form_valid(form)
+
+    def get_form_kwargs(self):
+        # Передаем текущего пользователя в kwargs
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
 
 
 class SendingUpdateView(LoginRequiredMixin, UpdateView):
@@ -199,11 +211,19 @@ class EventReportView(ListView):
     model = Event
     template_name = "mails/event_report.html"
     context_object_name = "events"
-    paginate_by = 20  # Количество событий на одной странице, если нужно
+    paginate_by = 20  # Количество событий на одной странице
 
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
+    #     status = self.request.GET.get("status")
+    #     if status:
+    #         queryset = queryset.filter(event_status=status)
+    #     return queryset.order_by("-event_datetime")
     def get_queryset(self):
-        queryset = super().get_queryset()
-        status = self.request.GET.get("status")
-        if status:
-            queryset = queryset.filter(event_status=status)
-        return queryset.order_by("-event_datetime")
+        # Фильтруем события только для текущего пользователя
+        return Event.objects.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['events'] = self.get_queryset()
+        return context
