@@ -18,6 +18,8 @@ redis = "^5.0.8"
 python-dotenv = "^1.0.1"
 flake8 = "^7.1.1"
 pytz = "^2024.1"
+crontab = "^1.0.1"
+django-crontab = "^0.7.1"
 
 
 [build-system]

@@ -14,11 +14,10 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -30,7 +29,6 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", False) == "True"
 
 ALLOWED_HOSTS = ["*"]  # разрешен доступ всем
-
 
 # Application definition
 
@@ -44,6 +42,7 @@ INSTALLED_APPS = [
     "mails",
     "users",
     "blog",
+    'django_crontab',
 ]
 
 MIDDLEWARE = [
@@ -76,7 +75,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DATABASES = {
@@ -105,7 +103,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -116,7 +113,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -149,7 +145,7 @@ LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 LOGIN_URL = "/users/login"
 
-CACHE_ENABLED = True
+CACHE_ENABLED = os.getenv("CACHE_ENABLED") == "True"
 
 if CACHE_ENABLED:
     CACHES = {
@@ -158,3 +154,12 @@ if CACHE_ENABLED:
             "LOCATION": os.getenv("LOCATION"),
         }
     }
+
+CRONJOBS = [
+    # """Тестовая строка: ежиминутная - выполнение и запись логов"""
+    # ('* * * * * ', 'mails.cron.daily_email_task', f'>> {BASE_DIR / "mails/logs/daily_task.log"} 2>&1'),
+
+    ('0 10 * * *', 'mails.cron.daily_email_task', f'>> {BASE_DIR / "mails/logs/daily_task.log"} 2>&1'),
+    ('0 10 * * 1', 'mails.cron.weekly_email_task', f'>> {BASE_DIR / "mails/logs/weekly_task.log"} 2>&1'),
+    ('0 10 1 * *', 'mails.cron.monthly_email_task', f'>> {BASE_DIR / "mails/logs/monthly_task.log"} 2>&1'),
+]

@@ -102,6 +102,16 @@ files = [
 ]
 
 [[package]]
+name = "crontab"
+version = "1.0.1"
+description = "Parse and use crontab schedules in Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "crontab-1.0.1.tar.gz", hash = "sha256:89477e3f93c81365e738d5ee2659509e6373bb2846de13922663e79aa74c6b91"},
+]
+
+[[package]]
 name = "decorator"
 version = "5.1.1"
 description = "Decorators for Humans"
@@ -131,6 +141,19 @@ tzdata = {version = "*", markers = "sys_platform == \"win32\""}
 [package.extras]
 argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
+
+[[package]]
+name = "django-crontab"
+version = "0.7.1"
+description = "dead simple crontab powered job scheduling for django"
+optional = false
+python-versions = "*"
+files = [
+    {file = "django-crontab-0.7.1.tar.gz", hash = "sha256:1201810a212460aaaa48eb6a766738740daf42c1a4f6aafecfb1525036929236"},
+]
+
+[package.dependencies]
+Django = ">=1.8"
 
 [[package]]
 name = "executing"
@@ -719,4 +742,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "ebf291dab02effb1be9d614938980dad269d79c70cd2a01f3991180bc65d1720"
+content-hash = "53aa5533f3a8e74aa5e6e41c1e5fac5459e3fa49d62be57b9bafc540b0efe162"
