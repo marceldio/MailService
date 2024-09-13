@@ -20,6 +20,8 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'mails:home' %}">Главная</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'blog:blog_list' %}">Блог</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'mails:contact' %}">Контакты</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'mails:sending_list' %}">Рассылки</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'mails:event_report' %}">Отчеты</a></li>
                     {% if perms.users.can_block_users and perms.users.can_view_users %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'users:user_list' %}">Пользователи</a></li>
                     {% endif %}
@@ -31,10 +33,10 @@
                     </a>
                     <ul class="dropdown-menu text-small">
                         {% if user.is_authenticated %}
-                        <li><a class="dropdown-item" href="{% url 'mails:sending_list' %}">Рассылки</a></li>
+<!--                        <li><a class="dropdown-item" href="{% url 'mails:sending_list' %}">Рассылки</a></li>-->
                         <li><a class="dropdown-item" href="{% url 'mails:maill_list' %}">Письма</a></li>
                         <li><a class="dropdown-item" href="{% url 'mails:recipient_list' %}">Адресаты</a></li>
-                        <li><a class="dropdown-item" href="{% url 'mails:event_report' %}">Отчеты</a></li>
+<!--                        <li><a class="dropdown-item" href="{% url 'mails:event_report' %}">Отчеты</a></li>-->
                         <li><a class="dropdown-item" href="{% url 'users:profile' user.pk %}">Профиль</a></li>
                         <li>
                             <hr class="dropdown-divider">

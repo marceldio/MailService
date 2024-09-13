@@ -81,7 +81,7 @@ class RecipientDeleteView(DeleteView):
     success_url = reverse_lazy("mails:recipient_list")
 
 
-class SendingListView(LoginRequiredMixin, ListView):
+class SendingListView(ListView):
     model = Sending
     context_object_name = "sendings"
     template_name = "mails/sending_list.html"

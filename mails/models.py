@@ -1,6 +1,6 @@
 from django.core.mail import send_mail, EmailMessage
 from django.db import models
-
+from django.utils.timezone import make_aware, is_naive
 from config import settings
 from users.models import User
 from django.utils import timezone
@@ -105,14 +105,23 @@ class Sending(models.Model):
         # Автоматическое присвоение компании из текущего пользователя
         if not self.company_id and "user" in kwargs:
             self.company = kwargs.pop("user").company
+        elif not self.company_id:
+            raise ValueError("User must be provided to set the company.")
 
         if not self.scheduled_at:
+            now = timezone.now()
             if self.frequency == "daily":
-                self.scheduled_at = timezone.now() + timedelta(days=1)
+                self.scheduled_at = now + timedelta(days=1)
             elif self.frequency == "weekly":
-                self.scheduled_at = timezone.now() + timedelta(weeks=1)
+                self.scheduled_at = now + timedelta(weeks=1)
             elif self.frequency == "monthly":
-                self.scheduled_at = timezone.now() + timedelta(days=30)
+                self.scheduled_at = now + timedelta(days=30)
+            else:
+                raise ValueError("Error: frequency")
+        else:
+            # Проверка и исправление на "timezone-aware" дату
+            if is_naive(self.scheduled_at):
+                self.scheduled_at = make_aware(self.scheduled_at)
 
         super(Sending, self).save(*args, **kwargs)
 

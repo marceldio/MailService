@@ -109,6 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = "ru-ru"
 
 TIME_ZONE = "UTC"
+# TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
 
@@ -156,10 +157,32 @@ if CACHE_ENABLED:
     }
 
 CRONJOBS = [
-    # """Тестовая строка: ежиминутная - выполнение и запись логов"""
-    # ('* * * * * ', 'mails.cron.daily_email_task', f'>> {BASE_DIR / "mails/logs/daily_task.log"} 2>&1'),
+    # """ежиминутная - выполнение и запись логов"""
 
-    ('0 10 * * *', 'mails.cron.daily_email_task', f'>> {BASE_DIR / "mails/logs/daily_task.log"} 2>&1'),
-    ('0 10 * * 1', 'mails.cron.weekly_email_task', f'>> {BASE_DIR / "mails/logs/weekly_task.log"} 2>&1'),
-    ('0 10 1 * *', 'mails.cron.monthly_email_task', f'>> {BASE_DIR / "mails/logs/monthly_task.log"} 2>&1'),
+    # ('* * * * *', 'python3 /home/md/Django/course_w_mail_sevice/manage.py send_emails', f'>> /home/md/Django/course_w_mail_sevice/mails/logs/task.log 2>&1'),
+    # ('* * * * *', 'mails.cron.periodic_email_task', f'>> /home/md/Django/course_w_mail_sevice/mails/logs/task.log 2>&1'),
+
+    # ('* * * * * ', f'python3 {BASE_DIR / "manage.py"} send_emails', f'>> {BASE_DIR / "mails/logs/task.log"} 2>&1'),
+    ('* * * * * ', 'mails.cron.periodic_email_task', f'>> {BASE_DIR / "mails/logs/task.log"} 2>&1'),
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            # 'filename': str(BASE_DIR / 'mails/logs/task.log'),
+            'filename': BASE_DIR / 'mails/logs/task.log',
+        },
+    },
+    'loggers': {
+        'mails.cron': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+
