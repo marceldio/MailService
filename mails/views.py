@@ -211,17 +211,11 @@ class EventReportView(ListView):
     model = Event
     template_name = "mails/event_report.html"
     context_object_name = "events"
-    paginate_by = 20  # Количество событий на одной странице
 
-    # def get_queryset(self):
-    #     queryset = super().get_queryset()
-    #     status = self.request.GET.get("status")
-    #     if status:
-    #         queryset = queryset.filter(event_status=status)
-    #     return queryset.order_by("-event_datetime")
     def get_queryset(self):
         # Фильтруем события только для текущего пользователя
-        return Event.objects.all()
+        event_list = Event.objects.all()[::-1]
+        return event_list[:20]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

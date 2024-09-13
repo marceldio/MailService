@@ -23,27 +23,6 @@
             {% endfor %}
         </tbody>
     </table>
-
-    <!-- Добавление пагинации, если нужно -->
-<!--    {% if is_paginated %}-->
-<!--        <div class="pagination">-->
-<!--            <span class="step-links">-->
-<!--                {% if page_obj.has_previous %}-->
-<!--                    <a href="?page=1">&laquo; Первая</a>-->
-<!--                    <a href="?page={{ page_obj.previous_page_number }}">Назад</a>-->
-<!--                {% endif %}-->
-
-<!--                <span class="current">-->
-<!--                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.-->
-<!--                </span>-->
-
-<!--                {% if page_obj.has_next %}-->
-<!--                    <a href="?page={{ page_obj.next_page_number }}">Вперед</a>-->
-<!--                    <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>-->
-<!--                {% endif %}-->
-<!--            </span>-->
-<!--        </div>-->
-<!--    {% endif %}-->
 {% endblock %}
 
 
