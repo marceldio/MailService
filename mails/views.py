@@ -111,7 +111,7 @@ class SendingCreateView(CreateView):
     def get_form_kwargs(self):
         # Передаем текущего пользователя в kwargs
         kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user
+        kwargs["user"] = self.request.user
         return kwargs
 
 
@@ -225,5 +225,5 @@ class EventReportView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['events'] = self.get_queryset()
+        context["events"] = self.get_queryset()
         return context

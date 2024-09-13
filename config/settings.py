@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(BASE_DIR / '.env')
+load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     "mails",
     "users",
     "blog",
-    'django_crontab',
+    "django_crontab",
 ]
 
 MIDDLEWARE = [
@@ -158,31 +158,32 @@ if CACHE_ENABLED:
 
 CRONJOBS = [
     # """ежиминутная - выполнение и запись логов"""
-
     # ('* * * * *', 'python3 /home/md/Django/course_w_mail_sevice/manage.py send_emails', f'>> /home/md/Django/course_w_mail_sevice/mails/logs/task.log 2>&1'),
     # ('* * * * *', 'mails.cron.periodic_email_task', f'>> /home/md/Django/course_w_mail_sevice/mails/logs/task.log 2>&1'),
-
     # ('* * * * * ', f'python3 {BASE_DIR / "manage.py"} send_emails', f'>> {BASE_DIR / "mails/logs/task.log"} 2>&1'),
-    ('* * * * * ', 'mails.cron.periodic_email_task', f'>> {BASE_DIR / "mails/logs/task.log"} 2>&1'),
+    (
+        "* * * * * ",
+        "mails.cron.periodic_email_task",
+        f'>> {BASE_DIR / "mails/logs/task.log"} 2>&1',
+    ),
 ]
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
             # 'filename': str(BASE_DIR / 'mails/logs/task.log'),
-            'filename': BASE_DIR / 'mails/logs/task.log',
+            "filename": BASE_DIR / "mails/logs/task.log",
         },
     },
-    'loggers': {
-        'mails.cron': {
-            'handlers': ['file'],
-            'level': 'INFO',
-            'propagate': True,
+    "loggers": {
+        "mails.cron": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": True,
         },
     },
 }
-

@@ -43,11 +43,10 @@ class RecipientForm(forms.ModelForm):
 class SendingForm(forms.ModelForm):
     class Meta:
         model = Sending
-        fields = ["letter", "recipients", "frequency", "status"]
+        fields = ["letter", "recipient", "frequency", "status"]
         widgets = {
             "recipients": forms.CheckboxSelectMultiple,
         }
-
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)  # Извлекаем текущего пользователя
@@ -55,7 +54,9 @@ class SendingForm(forms.ModelForm):
 
         # Фильтруем список адресатов, исключая самого пользователя
         if user:
-            self.fields["recipients"].queryset = Recipient.objects.filter(owner=user).exclude(email=user.email)
+            self.fields["recipient"].queryset = Recipient.objects.filter(
+                owner=user
+            ).exclude(email=user.email)
 
 
 class SendingManagerForm(ModelForm):

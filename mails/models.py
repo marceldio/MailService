@@ -1,7 +1,8 @@
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import EmailMessage
 from django.db import models
 from django.utils.timezone import make_aware, is_naive
 from config import settings
+from mails.cron import logger
 from users.models import User
 from django.utils import timezone
 from datetime import timedelta
@@ -97,7 +98,7 @@ class Sending(models.Model):
     letter = models.ForeignKey(
         Maill, on_delete=models.CASCADE, related_name="Письмо", blank=True, null=True
     )
-    recipients = models.ManyToManyField(Recipient, related_name="sendings")
+    recipient = models.ManyToManyField(Recipient, related_name="sendings")
     scheduled_at = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(blank=True, null=True, default=True)
 
@@ -132,7 +133,7 @@ class Sending(models.Model):
         from_email = settings.EMAIL_HOST_USER  # Используем EMAIL_HOST_USER
         reply_to = [self.company.email]  # Указываем email компании как Reply-To
 
-        for recipient in self.recipients.all():
+        for recipient in self.recipient.all():
             try:
                 email = EmailMessage(
                     subject=self.letter.title,
@@ -143,21 +144,30 @@ class Sending(models.Model):
                 )
                 email.send(fail_silently=False)
 
-                # Запись успешной отправки в Event
+                # Логирование успешной отправки и создания события
                 Event.objects.create(
                     event_status="succeeded",
-                    email=recipient,
-                    topic=self,
                     server_response="Success",
+                    email=recipient,  # Используем текущего получателя
+                    topic=self,
+                    owner=self.company,  # Используем owner текущей рассылки, если это то, что нужно
+                )
+                logger.info(
+                    f"Отчет по рассылке {self.id} с получателем {recipient.email}"
                 )
             except Exception as e:
-                # Запись неудачной отправки в Event
+                # Логирование ошибки
                 Event.objects.create(
                     event_status="failed",
-                    email=recipient,
-                    topic=self,
                     server_response=str(e),
+                    email=recipient,  # Используем текущего получателя
+                    topic=self,
+                    owner=self.company,  # Используем owner текущей рассылки, если это то, что нужно
                 )
+                logger.error(
+                    f"Ошибка при создании Отчета по рассылке {self.id} для получателя {recipient.email}: {str(e)}"
+                )
+                raise
 
     def __str__(self):
         return f"Sending {self.id} - {self.status}"
@@ -190,7 +200,9 @@ class Event(models.Model):
     topic = models.ForeignKey(
         Sending, on_delete=models.CASCADE, verbose_name="Тема рассылки"
     )
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="owner", blank=True, null=True)
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name="owner", blank=True, null=True
+    )
 
     def __str__(self):
         return f"Отправка: {self.event_datetime}"
